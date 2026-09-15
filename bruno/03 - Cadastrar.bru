@@ -1,0 +1,25 @@
+meta {
+  name: 03 - Cadastrar
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/cabanas
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "Cabana Recanto dos Pinheiros",
+    "localizacao": "Monte Verde, MG",
+    "precoPorNoite": 520.00,
+    "capacidadeHospedes": 5,
+    "disponivel": true
+  }
+}

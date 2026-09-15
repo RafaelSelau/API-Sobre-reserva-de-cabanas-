@@ -1,0 +1,25 @@
+meta {
+  name: 04 - Atualizar
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/cabanas/3
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "Cabana Recanto dos Pinheiros Premium",
+    "localizacao": "Monte Verde, MG",
+    "precoPorNoite": 580.00,
+    "capacidadeHospedes": 6,
+    "disponivel": true
+  }
+}

@@ -1,0 +1,14 @@
+# Build e binários do .NET
+bin/
+obj/
+
+# Ideias e Editores
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Arquivos de sistema
+Thumbs.db
+.DS_Store

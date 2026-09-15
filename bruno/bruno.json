@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "API Reserva de Cabanas",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
