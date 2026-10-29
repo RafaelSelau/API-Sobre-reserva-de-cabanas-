@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reserva de Cabanas</title>
+  <style>
+    :root {
+      --verde-escuro: #2d5a27;
+      --verde-medio: #4a7c3f;
+      --verde-claro: #7aab6e;
+      --bege: #f5f0e8;
+      --bege-escuro: #e8dcc8;
+      --marrom: #6b4226;
+      --marrom-claro: #a0714f;
+      --branco: #ffffff;
+      --cinza: #6b7280;
+      --cinza-claro: #f3f4f6;
+      --vermelho: #dc2626;
+      --vermelho-claro: #fef2f2;
+      --azul: #2563eb;
+      --sombra: 0 2px 8px rgba(0,0,0,0.12);
+      --raio: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bege);
+      color: #1f2937;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-medio) 100%);
+      color: var(--branco);
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--sombra);
+    }
+    header .logo { font-size: 2rem; }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header p  { font-size: 0.85rem; opacity: 0.85; }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--branco);
+      border-radius: var(--raio);
+      box-shadow: var(--sombra);
+      padding: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--verde-escuro);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ── FORMULÁRIO ── */
+    .form-group { margin-bottom: 1rem; }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cinza);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid #d1d5db;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      background: var(--cinza-claro);
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--verde-medio);
+      background: var(--branco);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.2rem;
+    }
+    input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--verde-medio);
+      cursor: pointer;
+    }
+    .checkbox-group span {
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    /* ── BOTÕES ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover  { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary  { background: var(--verde-medio); color: var(--branco); width: 100%; justify-content: center; margin-top: 0.5rem; }
+    .btn-cancel   { background: #e5e7eb; color: #374151; width: 100%; justify-content: center; margin-top: 0.4rem; }
+    .btn-edit     { background: #fef3c7; color: #92400e; padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .btn-delete   { background: var(--vermelho-claro); color: var(--vermelho); padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      display: none;
+      z-index: 9999;
+      max-width: 320px;
+    }
+    #toast.sucesso { background: var(--verde-escuro); color: var(--branco); }
+    #toast.erro    { background: var(--vermelho); color: var(--branco); }
+
+    /* ── LISTA ── */
+    .lista-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    #btn-refresh {
+      background: none;
+      border: 1.5px solid var(--verde-medio);
+      color: var(--verde-medio);
+      border-radius: 7px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    #btn-refresh:hover { background: var(--verde-medio); color: var(--branco); }
+
+    /* ── CABANA CARD ── */
+    #lista-cabanas { display: flex; flex-direction: column; gap: 1rem; }
+
+    .cabana-item {
+      border: 1.5px solid #e5e7eb;
+      border-radius: var(--raio);
+      padding: 1rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: box-shadow 0.2s;
+      background: var(--branco);
+    }
+    .cabana-item:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+
+    .cabana-info { flex: 1; min-width: 0; }
+    .cabana-nome {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--verde-escuro);
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cabana-local {
+      font-size: 0.82rem;
+      color: var(--cinza);
+      margin-bottom: 0.5rem;
+    }
+    .cabana-detalhes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-preco    { background: #ecfdf5; color: #065f46; }
+    .badge-hospedes { background: #eff6ff; color: #1e40af; }
+    .badge-disp     { background: #f0fdf4; color: #166534; }
+    .badge-indispon { background: #fef2f2; color: #991b1b; }
+
+    .cabana-acoes {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    /* ── ESTADO VAZIO / LOADING ── */
+    .estado-vazio {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--cinza);
+    }
+    .estado-vazio .icone { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .estado-vazio p { font-size: 0.95rem; }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--verde-medio);
+      font-weight: 600;
+    }
+
+    /* ── MODAL DE CONFIRMAÇÃO ── */
+    #modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 8000;
+    }
+    #modal-overlay.ativo { display: flex; }
+    #modal {
+      background: var(--branco);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    #modal h3 { font-size: 1.1rem; color: var(--vermelho); margin-bottom: 0.5rem; }
+    #modal p  { font-size: 0.9rem; color: var(--cinza); margin-bottom: 1.25rem; }
+    .modal-acoes { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .btn-modal-cancel  { background: #e5e7eb; color: #374151; }
+    .btn-modal-confirm { background: var(--vermelho); color: var(--branco); }
+
+    /* ── ID BADGE ── */
+    .id-badge {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      padding: 0.1rem 0.4rem;
+      margin-bottom: 0.2rem;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="logo">🏡</span>
+    <div>
+      <h1>Reserva de Cabanas</h1>
+      <p>Gerencie as cabanas disponíveis para hospedagem</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- ── FORMULÁRIO ── -->
+    <div class="card">
+      <h2 id="form-titulo">🌲 Nova Cabana</h2>
+      <form id="form-cabana" novalidate>
+        <input type="hidden" id="campo-id" />
+
+        <div class="form-group">
+          <label for="campo-nome">Nome da Cabana</label>
+          <input type="text" id="campo-nome" placeholder="Ex: Cabana Vista da Serra" required />
+        </div>
+
+        <div class="form-group">
+          <label for="campo-local">Localização</label>
+          <input type="text" id="campo-local" placeholder="Ex: Campos do Jordão, SP" required />
+        </div>
+
+        <div class="form-group">
+          <label for="campo-preco">Preço por Noite (R\$)</label>
+          <input type="number" id="campo-preco" placeholder="0.00" min="0" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+          <label for="campo-hospedes">Capacidade de Hóspedes</label>
+          <input type="number" id="campo-hospedes" placeholder="Ex: 4" min="1" required />
+        </div>
+
+        <div class="form-group">
+          <label>Disponibilidade</label>
+          <div class="checkbox-group">
+            <input type="checkbox" id="campo-disponivel" />
+            <span>Cabana disponível para reserva</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-salvar">
+          ✅ Cadastrar Cabana
+        </button>
+        <button type="button" class="btn btn-cancel" id="btn-cancelar" style="display:none;">
+          ✖ Cancelar Edição
+        </button>
+      </form>
+    </div>
+
+    <!-- ── LISTA ── -->
+    <div class="card">
+      <div class="lista-header">
+        <h2>📋 Cabanas Cadastradas</h2>
+        <button id="btn-refresh">🔄 Atualizar</button>
+      </div>
+      <div id="lista-cabanas">
+        <div class="loading">⏳ Carregando cabanas...</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── MODAL ── -->
+  <div id="modal-overlay">
+    <div id="modal">
+      <h3>🗑️ Confirmar Exclusão</h3>
+      <p id="modal-msg">Tem certeza que deseja excluir esta cabana? Esta ação não pode ser desfeita.</p>
+      <div class="modal-acoes">
+        <button class="btn btn-modal-cancel" id="btn-modal-cancel">Cancelar</button>
+        <button class="btn btn-modal-confirm" id="btn-modal-confirm">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div id="toast"></div>
+
+  <script>
+    const API = '/api/cabanas';
+    let idExcluir = null;
+
+    // ── Utilitários ──────────────────────────────────────────────────────────
+
+    function toast(msg, tipo = 'sucesso', duracao = 3000) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = tipo;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, duracao);
+    }
+
+    function formatarPreco(v) {
+      return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // ── Listar ───────────────────────────────────────────────────────────────
+
+    async function listarCabanas() {
+      const lista = document.getElementById('lista-cabanas');
+      lista.innerHTML = '<div class="loading">⏳ Carregando...</div>';
+
+      try {
+        const res = await fetch(API);
+        if (!res.ok) throw new Error('Erro ao buscar cabanas');
+        const cabanas = await res.json();
+
+        if (cabanas.length === 0) {
+          lista.innerHTML = `
+            <div class="estado-vazio">
+              <div class="icone">🏕️</div>
+              <p>Nenhuma cabana cadastrada ainda.<br>Use o formulário ao lado para adicionar a primeira.</p>
+            </div>`;
+          return;
+        }
+
+        lista.innerHTML = cabanas.map(c => `
+          <div class="cabana-item" id="item-${c.id}">
+            <div class="cabana-info">
+              <div class="id-badge">ID #${c.id}</div>
+              <div class="cabana-nome">${escapeHtml(c.nome)}</div>
+              <div class="cabana-local">📍 ${escapeHtml(c.localizacao)}</div>
+              <div class="cabana-detalhes">
+                <span class="badge badge-preco">💰 ${formatarPreco(c.precoPorNoite)}/noite</span>
+                <span class="badge badge-hospedes">👥 ${c.capacidadeHospedes} hóspedes</span>
+                <span class="badge ${c.disponivel ? 'badge-disp' : 'badge-indispon'}">
+                  ${c.disponivel ? '✅ Disponível' : '❌ Indisponível'}
+                </span>
+              </div>
+            </div>
+            <div class="cabana-acoes">
+              <button class="btn btn-edit" onclick="prepararEdicao(${c.id})">✏️ Editar</button>
+              <button class="btn btn-delete" onclick="abrirModalExclusao(${c.id}, '${escapeHtml(c.nome)}')">🗑️</button>
+            </div>
+          </div>`).join('');
+      } catch (err) {
+        lista.innerHTML = `
+          <div class="estado-vazio">
+            <div class="icone">⚠️</div>
+            <p>Falha ao conectar com a API.<br>Verifique se o servidor está em execução.</p>
+          </div>`;
+        toast('Erro ao carregar cabanas: ' + err.message, 'erro');
+      }
+    }
+
+    // ── Cadastrar / Atualizar ─────────────────────────────────────────────────
+
+    document.getElementById('form-cabana').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('campo-id').value;
+      const payload = {
+        nome: document.getElementById('campo-nome').value.trim(),
+        localizacao: document.getElementById('campo-local').value.trim(),
+        precoPorNoite: parseFloat(document.getElementById('campo-preco').value) || 0,
+        capacidadeHospedes: parseInt(document.getElementById('campo-hospedes').value) || 1,
+        disponivel: document.getElementById('campo-disponivel').checked
+      };
+
+      if (!payload.nome || !payload.localizacao) {
+        toast('Preencha Nome e Localização.', 'erro');
+        return;
+      }
+
+      const btn = document.getElementById('btn-salvar');
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvando...';
+
+      try {
+        let res;
+        if (id) {
+          res = await fetch(`${API}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ mensagem: 'Erro desconhecido' }));
+          throw new Error(err.mensagem || 'Erro na operação');
+        }
+
+        toast(id ? '✅ Cabana atualizada com sucesso!' : '✅ Cabana cadastrada com sucesso!');
+        resetarFormulario();
+        listarCabanas();
+      } catch (err) {
+        toast('Erro: ' + err.message, 'erro');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── Editar ───────────────────────────────────────────────────────────────
+
+    async function prepararEdicao(id) {
+      try {
+        const res = await fetch(`${API}/${id}`);
+        if (!res.ok) throw new Error('Cabana não encontrada');
+        const c = await res.json();
+
+        document.getElementById('campo-id').value = c.id;
+        document.getElementById('campo-nome').value = c.nome;
+        document.getElementById('campo-local').value = c.localizacao;
+        document.getElementById('campo-preco').value = c.precoPorNoite;
+        document.getElementById('campo-hospedes').value = c.capacidadeHospedes;
+        document.getElementById('campo-disponivel').checked = c.disponivel;
+
+        document.getElementById('form-titulo').textContent = `✏️ Editar Cabana #${c.id}`;
+        document.getElementById('btn-salvar').textContent = '💾 Salvar Alterações';
+        document.getElementById('btn-cancelar').style.display = 'block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        toast('Erro ao carregar dados: ' + err.message, 'erro');
+      }
+    }
+
+    document.getElementById('btn-cancelar').addEventListener('click', resetarFormulario);
+
+    function resetarFormulario() {
+      document.getElementById('form-cabana').reset();
+      document.getElementById('campo-id').value = '';
+      document.getElementById('form-titulo').textContent = '🌲 Nova Cabana';
+      document.getElementById('btn-salvar').textContent = '✅ Cadastrar Cabana';
+      document.getElementById('btn-cancelar').style.display = 'none';
+    }
+
+    // ── Excluir ──────────────────────────────────────────────────────────────
+
+    function abrirModalExclusao(id, nome) {
+      idExcluir = id;
+      document.getElementById('modal-msg').textContent =
+        `Tem certeza que deseja excluir a cabana "${nome}"? Esta ação não pode ser desfeita.`;
+      document.getElementById('modal-overlay').classList.add('ativo');
+    }
+
+    document.getElementById('btn-modal-cancel').addEventListener('click', () => {
+      document.getElementById('modal-overlay').classList.remove('ativo');
+      idExcluir = null;
+    });
+
+    document.getElementById('btn-modal-confirm').addEventListener('click', async () => {
+      if (!idExcluir) return;
+      document.getElementById('modal-overlay').classList.remove('ativo');
+
+      try {
+        const res = await fetch(`${API}/${idExcluir}`, { method: 'DELETE' });
+        if (res.status === 204) {
+          toast('🗑️ Cabana excluída com sucesso!');
+          listarCabanas();
+        } else if (res.status === 404) {
+          toast('Cabana não encontrada.', 'erro');
+        } else {
+          throw new Error('Falha na exclusão');
+        }
+      } catch (err) {
+        toast('Erro ao excluir: ' + err.message, 'erro');
+      } finally {
+        idExcluir = null;
+      }
+    });
+
+    // ── Botão Atualizar ───────────────────────────────────────────────────────
+
+    document.getElementById('btn-refresh').addEventListener('click', listarCabanas);
+
+    // ── Segurança (escape HTML) ───────────────────────────────────────────────
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ── Inicializar ───────────────────────────────────────────────────────────
+    listarCabanas();
+  </script>
+</body>
+</html>

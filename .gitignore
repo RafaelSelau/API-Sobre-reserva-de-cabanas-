@@ -2,7 +2,12 @@
 bin/
 obj/
 
-# Ideias e Editores
+# Banco SQLite local (não versionar dados de teste)
+*.db
+*.db-shm
+*.db-wal
+
+# IDEs e Editores
 .vs/
 .vscode/
 .idea/
@@ -12,3 +17,8 @@ obj/
 # Arquivos de sistema
 Thumbs.db
 .DS_Store
+
+# Segredos e variáveis de ambiente locais
+*.env
+appsettings.*.json
+!appsettings.json
